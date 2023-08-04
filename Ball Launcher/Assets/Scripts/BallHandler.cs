@@ -11,7 +11,6 @@ public class BallHandler : MonoBehaviour
     [SerializeField] private float _detachTime;
     [SerializeField] private float _respawnDelay;
 
-
     private Rigidbody2D _currentBallRigidbody;
     private SpringJoint2D _currentBallSprintJoint;
 
@@ -23,6 +22,8 @@ public class BallHandler : MonoBehaviour
     {
         //_mainCamera = Camera.main;
         _mainCamera = GameObject.Find("Main Camera").GetComponent<Camera>();
+
+        SpawnNewBall();
     }
 
     // Update is called once per frame
@@ -49,6 +50,14 @@ public class BallHandler : MonoBehaviour
         Vector3 worldPosition = _mainCamera.ScreenToWorldPoint(touchPosition);
         _currentBallRigidbody.position = worldPosition;
 
+
+    }
+
+    private void SpawnNewBall(){
+        GameObject ballInstance = Instantiate(_ballPrefab, _pivot.position, Quaternion.identity);
+        _currentBallRigidbody = ballInstance.GetComponent<Rigidbody2D>();
+        _currentBallSprintJoint = ballInstance.GetComponent<SpringJoint2D>();
+        _currentBallSprintJoint.connectedBody = _pivot;
     }
 
     private void LaunchBall()
@@ -64,5 +73,7 @@ public class BallHandler : MonoBehaviour
     {
         _currentBallSprintJoint.enabled = false;
         _currentBallSprintJoint = null;
+
+        Invoke(nameof(SpawnNewBall), _respawnDelay);
     }
 }
